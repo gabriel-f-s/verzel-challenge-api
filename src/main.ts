@@ -1,12 +1,18 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
 
 async function bootstrap() {
+  const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
 
-  app.enableCors();
+  app.enableCors({
+    origin: process.env.FRONT_END_URL ?? 'http://localhost:5173',
+    credentials: true,
+  });
+  app.use(helmet());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -39,10 +45,8 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT ?? 3000);
 
-  console.log(
-    `🚀 API rodando em: http://localhost:${process.env.PORT ?? 3000}`,
-  );
-  console.log(
+  logger.log(`🚀 API rodando em: http://localhost:${process.env.PORT ?? 3000}`);
+  logger.log(
     `📚 Swagger Docs disponível em: http://localhost:${process.env.PORT ?? 3000}/api/docs`,
   );
 }
