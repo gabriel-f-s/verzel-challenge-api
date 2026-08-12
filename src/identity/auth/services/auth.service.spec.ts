@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { UserService } from '../user/user.service';
+import { UserService } from '../../user/services/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { Role } from '../user/enums/role.enum';
+import { Role } from '../../user/models/enums/role.enum';
 
 jest.mock('bcrypt');
 

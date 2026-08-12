@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserController } from './user.controller';
-import { UserService } from './user.service';
-import { Role } from './enums/role.enum';
+import { UserService } from '../services/user.service';
+import { Role } from '../models/enums/role.enum';
 
 describe('UserController', () => {
   let controller: UserController;

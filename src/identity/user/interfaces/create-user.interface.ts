@@ -1,4 +1,4 @@
-import { Role } from '../enums/role.enum';
+import { Role } from '../models/enums/role.enum';
 
 export interface CreateUser {
   name: string;

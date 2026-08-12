@@ -1,8 +1,8 @@
 import { Controller, Get } from '@nestjs/common';
-import { UserService } from './user.service';
+import { UserService } from '../services/user.service';
 import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { UserResponseDto } from './dto/user-response.dto';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { UserResponseDto } from '../dto/user-response.dto';
+import { CurrentUser } from '../../../common/decorators/current-user.decorator';
 
 @Controller('users')
 export class UserController {

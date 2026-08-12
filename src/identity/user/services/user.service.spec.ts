@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserService } from './user.service';
-import { UserRepository } from './user.repository';
+import { UserRepository } from '../repositories/user.repository';
 import { ConflictException, NotFoundException } from '@nestjs/common';
-import { Role } from './enums/role.enum';
+import { Role } from '../models/enums/role.enum';
 
 describe('UserService', () => {
   let service: UserService;

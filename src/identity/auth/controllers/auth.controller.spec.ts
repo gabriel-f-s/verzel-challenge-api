@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
-import { Role } from '../user/enums/role.enum';
+import { AuthService } from '../services/auth.service';
+import { RegisterDto } from '../dto/register.dto';
+import { LoginDto } from '../dto/login.dto';
+import { Role } from '../../user/models/enums/role.enum';
 
 describe('AuthController', () => {
   let controller: AuthController;

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { UserRepository } from './user.repository';
-import { UserService } from './user.service';
-import { UserController } from './user.controller';
+import { UserRepository } from './repositories/user.repository';
+import { UserService } from './services/user.service';
+import { UserController } from './controllers/user.controller';
 
 @Module({
   providers: [UserService, UserRepository],
