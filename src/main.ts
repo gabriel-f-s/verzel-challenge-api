@@ -36,7 +36,7 @@ async function bootstrap() {
         description: 'Insira o token JWT retornado no login',
         in: 'header',
       },
-      'JWT-Auth',
+      'bearer',
     )
     .build();
 
