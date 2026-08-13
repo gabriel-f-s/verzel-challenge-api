@@ -30,7 +30,7 @@ export class EventService {
       imageUrl: request.imageUrl,
       location: request.location,
       date: request.date,
-      type: request.type as Type,
+      type: request.type,
       capacity: request.capacity,
       price: request.price,
     });
@@ -89,7 +89,7 @@ export class EventService {
       imageUrl: request.imageUrl,
       location: request.location,
       date: request.date,
-      type: request.type as Type,
+      type: request.type,
       capacity: request.capacity,
       price: request.price,
     });
