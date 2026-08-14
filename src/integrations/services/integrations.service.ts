@@ -1,17 +1,13 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { TmdbProvider } from '../providers/tmdb.provider';
-import { EventService } from '../../events/services/event.service';
 import { ExternalSource } from '../../events/domain/enums/external-source.enum';
 import { ExternalEventData } from '../domain/interfaces/external-provider.interface';
 
 @Injectable()
 export class IntegrationsService {
-  constructor(
-    private readonly tmdbProvider: TmdbProvider,
-    private readonly eventService: EventService,
-  ) {}
+  constructor(private readonly tmdbProvider: TmdbProvider) {}
 
-  async search(query: string, source: string) {
+  async search(query: string, source: string): Promise<ExternalEventData[]> {
     if ((source as ExternalSource) === ExternalSource.TMDB) {
       return this.tmdbProvider.search(query);
     }
@@ -20,7 +16,10 @@ export class IntegrationsService {
     );
   }
 
-  async importEvent(source: string, externalId: string, organizerId: string) {
+  async getById(
+    source: string,
+    externalId: string,
+  ): Promise<ExternalEventData> {
     let externalEvent: ExternalEventData | null = null;
 
     if ((source as ExternalSource) === ExternalSource.TMDB) {
@@ -35,20 +34,6 @@ export class IntegrationsService {
       throw new BadRequestException('Evento não encontrado na fonte externa.');
     }
 
-    return this.eventService.create(
-      {
-        title: externalEvent.title,
-        description: externalEvent.description,
-        imageUrl: externalEvent.imageUrl,
-        location: externalEvent.location,
-        date: externalEvent.date,
-        type: externalEvent.type,
-        capacity: externalEvent.capacity,
-        price: externalEvent.price,
-      },
-      organizerId,
-      externalEvent.externalId,
-      externalEvent.source,
-    );
+    return externalEvent;
   }
 }

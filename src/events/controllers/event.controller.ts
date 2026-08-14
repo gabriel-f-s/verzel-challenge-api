@@ -19,6 +19,7 @@ import {
 import { EventService } from '../services/event.service';
 import { CreateEventDto } from '../dto/create-event.dto';
 import { UpdateEventDto } from '../dto/update-event.dto';
+import { ImportEventDto } from '../dto/import-event.dto';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { Public } from '../../common/decorators/public.decorator';
 import { RolesGuard } from '../../common/guards/roles.guard';
@@ -32,7 +33,7 @@ export class EventController {
   @Post()
   @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Cria um novo evento',
+    summary: 'Cria um novo evento manual',
     description: 'Rota restrita a usuários Organizadores.',
   })
   @UseGuards(RolesGuard)
@@ -42,6 +43,22 @@ export class EventController {
     @CurrentUser('id') userId: string,
   ) {
     return this.eventsService.create(createEventDto, userId);
+  }
+
+  @Post('import')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Importa um evento a partir de uma API externa (ex: TMDB)',
+    description:
+      'Busca os dados artísticos na API externa e mescla com os dados da sessão (data, local, preço, capacidade) definidos pelo organizador.',
+  })
+  @UseGuards(RolesGuard)
+  @Roles('ORGANIZADOR')
+  importEvent(
+    @Body() importEventDto: ImportEventDto,
+    @CurrentUser('id') userId: string,
+  ) {
+    return this.eventsService.importFromExternal(importEventDto, userId);
   }
 
   @Public()

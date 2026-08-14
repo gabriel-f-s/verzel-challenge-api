@@ -6,14 +6,19 @@ import {
 } from '@nestjs/common';
 import { CreateEventDto } from '../dto/create-event.dto';
 import { UpdateEventDto } from '../dto/update-event.dto';
+import { ImportEventDto } from '../dto/import-event.dto';
 import { EventRepository } from '../repositories/event.repository';
 import { Event } from '../domain/entities/event.entity';
 import { Type } from '../domain/enums/type.enum';
 import { ExternalSource } from '../domain/enums/external-source.enum';
+import { IntegrationsService } from '../../integrations/services/integrations.service';
 
 @Injectable()
 export class EventService {
-  constructor(private readonly eventRepository: EventRepository) {}
+  constructor(
+    private readonly eventRepository: EventRepository,
+    private readonly integrationsService: IntegrationsService,
+  ) {}
 
   async create(
     request: CreateEventDto,
@@ -34,6 +39,29 @@ export class EventService {
       capacity: request.capacity,
       price: request.price,
     });
+  }
+
+  async importFromExternal(dto: ImportEventDto, organizerId: string) {
+    const externalData = await this.integrationsService.getById(
+      dto.source,
+      dto.externalId,
+    );
+
+    return this.create(
+      {
+        title: externalData.title,
+        description: externalData.description,
+        imageUrl: externalData.imageUrl,
+        location: dto.location,
+        date: dto.date,
+        type: dto.type ?? externalData.type,
+        capacity: dto.capacity,
+        price: dto.price,
+      },
+      organizerId,
+      externalData.externalId,
+      dto.source,
+    );
   }
 
   async findAll(filters?: {
