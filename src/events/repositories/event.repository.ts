@@ -12,16 +12,19 @@ export class EventRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(filters?: EventFilter): Promise<Event[]> {
+    const order =
+      filters?.orderBy === 'upcoming'
+        ? { date: 'asc' as const }
+        : { createdAt: 'desc' as const };
+
     return (
-      await this.prisma.event
-        .findMany({
-          where: {
-            ...(filters?.type && { type: filters.type }),
-            ...(filters?.source && { externalSource: filters.source }),
-          },
-          orderBy: { date: 'asc' },
-        })
-        .then()
+      await this.prisma.event.findMany({
+        where: {
+          ...(filters?.type && { type: filters.type }),
+          ...(filters?.source && { externalSource: filters.source }),
+        },
+        orderBy: order,
+      })
     ).map((event: EventPrisma) => this.mapToEntity(event));
   }
 

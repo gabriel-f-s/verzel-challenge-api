@@ -67,6 +67,7 @@ export class EventService {
   async findAll(filters?: {
     type?: string;
     source?: string;
+    orderBy?: string;
   }): Promise<Event[]> {
     let type: Type | undefined = undefined;
     let source: ExternalSource | undefined = undefined;
@@ -84,6 +85,7 @@ export class EventService {
     return this.eventRepository.findAll({
       type,
       source,
+      orderBy: filters?.orderBy,
     });
   }
 

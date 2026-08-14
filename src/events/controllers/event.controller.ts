@@ -77,8 +77,19 @@ export class EventController {
     required: false,
     description: 'Filtra eventos pela origem (ex: TMDB, CUSTOM)',
   })
-  findAll(@Query('type') type?: string, @Query('source') source?: string) {
-    return this.eventsService.findAll({ type, source });
+  @ApiQuery({
+    name: 'orderBy',
+    required: false,
+    description:
+      'Ordenação: recent (padrão, mais recentes criados) ou upcoming (datas mais próximas da sessão)',
+    enum: ['recent', 'upcoming'],
+  })
+  findAll(
+    @Query('type') type?: string,
+    @Query('source') source?: string,
+    @Query('orderBy') orderBy?: string,
+  ) {
+    return this.eventsService.findAll({ type, source, orderBy });
   }
 
   @Public()
