@@ -1,113 +1,85 @@
-# 🎟️ Plataforma de Eventos e Ingressos - API
+# EliteTickets - API & Main Repository 🚀
 
-Back-end desenvolvido em **NestJS** e **Prisma ORM** com banco de dados **PostgreSQL**, seguindo os princípios de **Domain-Driven Design (DDD)** em uma arquitetura de **Monolito Modular com Bounded Contexts**.
-
-Projeto desenvolvido para o **Desafio Elite Dev da Verzel**.
+**Plataforma de Eventos e Ingressos** completa para o desafio técnico "Desafio Elite Dev" da Verzel.
 
 ---
 
-## 🔗 Repositórios do Projeto
+## 🎯 Arquitetura & Decisões Técnicas (Back-End)
 
-- **Back-End (API)**: Este repositório
-- **Front-End (SPA)**: `verzel-challenge-spa`
+Tomei decisões arquiteturais cruciais visando criar um software escalável, sustentável e seguindo os princípios de **Clean Architecture**, **DDD (Domain-Driven Design)**, **SOLID** e **KISS**.
 
----
-
-## 📐 Documentação Arquitetural e Diagramas
-
-Para detalhes aprofundados sobre a modelagem de entidades, diagramas de classe, DER e decisões de desacoplamento, consulte:
-👉 **[Documentação de Arquitetura & Diagramas (docs/architecture.md)](docs/architecture.md)**
+### NestJS + Prisma + PostgreSQL
+- **Desacoplamento de Domínio**: As entidades (ex: `User`, `Event`, `Ticket`) e enums (`Type`, `TicketStatus`, `ValidationStatus`) são modelados como classes TypeScript puras. Elas não possuem nenhuma dependência das classes do Prisma ou dos decoradores do NestJS, o que blinda a lógica de negócio principal.
+- **Anti-Corruption Layer (ACL)**: O `IntegrationsModule` funciona como uma camada de anti-corrupção, isolando a comunicação de rede e os contratos instáveis da API externa do TheMovieDB (TMDb) do nosso domínio interno.
+- **Anti-Concorrência em Assentos (O Core do Desafio)**: A reserva de assentos marcados em eventos do tipo `SEATED` acontece por meio de uma transação isolada (`prisma.$transaction`). Isso soluciona o clássico problema de concorrência e **garante matematicamente que o mesmo lugar nunca seja vendido duas vezes**, retornando um erro limpo (HTTP 409) em caso de colisão entre dois clientes no exato mesmo milissegundo.
+- **Criptografia Anti-Fraude (HMAC)**: Os QR Codes emitidos **não** carregam IDs fáceis de burlar ou um status boolean em texto plano. Eles carregam uma **Assinatura HMAC-SHA256**. Esta assinatura criptográfica é gerada misturando o ID do evento, ID do cliente, Data e um segredo (Secret) do servidor. É matematicamente impossível forjar ou alterar um QR code externamente sem conhecer a chave secreta.
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## 🤖 Metodologia & Uso de IA (Pair Programming)
 
-- **Runtime & Framework**: [Node.js](https://nodejs.org/) com [NestJS 11](https://nestjs.com/) e TypeScript
-- **Banco de Dados**: [PostgreSQL 16](https://www.postgresql.org/) rodando via [Docker Compose](https://docs.docker.com/compose/)
-- **ORM & Migrations**: [Prisma ORM](https://www.prisma.io/)
-- **Criptografia & Segurança**: [bcrypt](https://github.com/kelektiv/node.bcrypt.js) para senhas e HMAC-SHA256 para assinatura de QR Codes
-- **Testes**: Jest para testes unitários e de integração
+Fiz o uso da I.A para me auxiliar em trechos de código, documentação e planejamento do projeto. Onde fiz o uso de "pair programming" revisando e testando todo código antes de commitar.
+
+- **Arquitetura**: Atuei como líder técnico, impondo as restrições e exigindo da IA os padrões estruturais (ex: manter a Anti-Corruption Layer, usar transações no Repositório para os tickets, separar papéis de usuário em Enums limpos).
+- **Execução e Refatoração (Velocidade)**: Com a arquitetura garantida, acionei a IA para gerar as rotas repetitivas do CRUD e acelerar a construção mecânica dos DTOs.
+- **Auditoria de Código**: Utilizei a IA para verificar brechas e analisar casos de ponta. A decisão do HMAC foi validada ativamente nesse fluxo. No fim, impedi "AI Slop" ao assumir total controle do resultado estético e logico das pastas.
 
 ---
 
-## 🚀 Como Configurar e Executar
+## 🛠️ Tecnologias Utilizadas (API)
+- **Node.js v18+** & **NestJS** (Dependency Injection nativo e padronização modular).
+- **TypeScript** em Strict Mode.
+- **Prisma ORM** servindo de repositório abstraído para o **PostgreSQL**.
+- **Bcrypt** para hashes seguros de senhas.
+- **Jest** focado para entregar testes unitários consistentes nos serviços vitais.
 
-### Pré-requisitos
-- **Node.js**: >= 20.x
-- **Docker** e **Docker Compose** instalados
+---
 
-### Passo a Passo
+## 🚀 Como Rodar e Testar
+
+### 1. Banco de Dados e Configuração
+Abra um terminal, acesse a pasta da API:
+```bash
+cd api
+```
+
+Crie o arquivo `.env` baseado no arquivo de exemplo e preencha suas chaves:
+```bash
+cp .env.example .env
+```
+*(No mínimo, você precisa de um banco `DATABASE_URL` do Postgres válido e da `TMDB_API_KEY` para as buscas do organizador).*
+
+### 2. Instalação e Seeding (Dados Iniciais)
+Instale as dependências do back-end, aplique a modelagem no banco (Schema) e rode o Seeding:
 
 ```bash
-# 1. Clonar o repositório e entrar na pasta
-git clone <url-do-repositorio-api>
-cd api
-
-# 2. Instalar as dependências
 npm install
-
-# 3. Configurar variáveis de ambiente
-cp .env.example .env
-
-# 4. Subir o banco de dados PostgreSQL via Docker
-docker compose up -d
-
-# 5. Executar as migrações do banco de dados e gerar o Prisma Client
-npm run prisma:migrate
-
-# 6. Popular o banco com os dados iniciais de teste (Seed)
+npx prisma db push
+npx prisma generate
 npm run prisma:seed
+```
+> 💡 **MUITO IMPORTANTE:** O comando `npm run prisma:seed` limpará o banco (se houver dados sujos) e injetará exatamente 1 Organizador, 2 Clientes, 1 Portaria e 1 Filme configurado com lugares disponíveis. Não é preciso cadastrar ninguém na mão para ver a aplicação rodando!
 
-# 7. Iniciar o servidor de desenvolvimento
+### 3. Iniciar a Aplicação
+Suba o servidor de desenvolvimento:
+```bash
 npm run start:dev
 ```
-
-A API estará rodando em: `http://localhost:3000`
-
----
-
-## 👤 Credenciais de Teste (Seed Data)
-
-O banco de dados é inicializado com usuários pré-cadastrados para todos os papéis da aplicação.
-
-> **Senha padrão para todos os usuários**: `Password123!`
-
-| Papel | Nome | E-mail | Descrição / Permissões |
-| :--- | :--- | :--- | :--- |
-| **ORGANIZADOR** | Carlos Organizador | `organizador@verzel.com` | Cria e gerencia eventos, define lotes e assentos |
-| **CLIENTE** | Ana Cliente | `cliente1@verzel.com` | Reserva assentos, realiza checkout e acessa ingressos |
-| **CLIENTE** | Bruno Silva | `cliente2@verzel.com` | Segundo cliente para testes de concorrência |
-| **PORTARIA** | Marcos Portaria | `portaria@verzel.com` | Valida QR Codes de ingressos na portaria do evento |
-
-### 🎭 Eventos Semeados:
-1. **"Interstellar - Sessão Especial IMAX"**:
-   - Tipo: `SEATED` (com mapa de assentos)
-   - Preço: R$ 45,00 | Capacidade: 60 lugares
-   - Origem: Catálogo TMDb
-   - *Inclui 1 ingresso válido emitido para a Ana (Assento C5) e 1 ingresso já validado para o Bruno (Assento C6).*
-2. **"Coldplay - Music of the Spheres Tour"**:
-   - Tipo: `GENERAL` (Pista / Por quantidade)
-   - Preço: R$ 280,00 | Capacidade: 2500 pessoas
-   - Origem: Catálogo Ticketmaster
+A API escutará na porta `3000`. O **Swagger UI** com toda a coleção de rotas ficará disponível em `http://localhost:3000/api`.
 
 ---
 
-## 📜 Scripts Disponíveis
+## 🔐 Dados de Teste (Criados via Seed)
 
-```bash
-# Desenvolvimento
-npm run start:dev        # Inicia a API em modo watch
-npm run start:debug      # Inicia em modo debug
+Para facilitar a verificação dos três papéis, utilize estas credenciais cadastradas via Seed:
 
-# Banco de Dados & Prisma
-npm run prisma:migrate   # Aplica migrations pendentes no banco
-npm run prisma:generate  # Regenera o client TypeScript do Prisma
-npm run prisma:seed      # Executa o seed de usuários e eventos
-npm run prisma:studio    # Abre a interface visual do Prisma Studio
+- **Senha Global para todas as contas:** `Password123!`
 
-# Testes & Qualidade
-npm run test             # Executa testes unitários
-npm run test:e2e         # Executa testes end-to-end
-npm run lint             # Executa o ESLint para validação de código
-npm run format           # Formata o código com Prettier
-```
+| Conta / Papel | E-mail de Teste          | O que fazer? |
+| :--- |:-------------------------| :--- |
+| **Organizador** | `organizador@verzel.com` | Logue no Front-End, busque eventos e edite configurações. |
+| **Cliente** | `cliente1@verzel.com`    | Navegue pelo catálogo, reserve cadeiras, faça o pagamento falso e receba os QR Codes gerados no menu "Meus Ingressos". |
+| **Portaria** | `portaria@verzel.com`    | Abra a área "Validador" e escaneie o código do cliente na tela com a câmera. |
+
+---
+Feito com dedicação ☕ para a Verzel.
