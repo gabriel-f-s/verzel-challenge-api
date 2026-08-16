@@ -47,8 +47,8 @@ async function main() {
   // 3. Criando Portaria
   const portaria = await prisma.user.create({
     data: {
-      name: 'Zeca Portaria',
-      email: 'portaria@verzel.com.br',
+      name: 'Gandalf Portaria',
+      email: 'portaria@verzel.com',
       passwordHash,
       role: 'PORTARIA',
     },
@@ -83,10 +83,10 @@ async function main() {
 --- DADOS DE LOGIN ---
 Senhas para todos os usuários: ${defaultPassword}
 
-Organizador: organizador@verzel.com.br
-Cliente 1: joao@cliente.com
-Cliente 2: maria@cliente.com
-Portaria: portaria@verzel.com.br
+Organizador: organizador@verzel.com
+Cliente 1: cliente1@verzel.com
+Cliente 2: cliente2@verzel.com
+Portaria: portaria@verzel.com
 ----------------------
   `);
 }
