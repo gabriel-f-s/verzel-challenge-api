@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  ConflictException,
-} from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { Ticket } from '../domain/entities/ticket.entity';
 import { CreateTicket } from '../interfaces/create-ticket.interface';

@@ -200,7 +200,9 @@ export class TicketService {
       };
     }
 
-    const event = await this.eventService.findOne(ticket.eventId).catch(() => null);
+    const event = await this.eventService
+      .findOne(ticket.eventId)
+      .catch(() => null);
 
     const validationResult = ticket.validate(dto.eventId, validatorUserId);
 

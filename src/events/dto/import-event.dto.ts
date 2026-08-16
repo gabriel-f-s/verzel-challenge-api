@@ -56,7 +56,8 @@ export class ImportEventDto {
 
   @ApiProperty({
     example: 120,
-    description: 'Capacidade máxima de pessoas/assentos definida pelo organizador',
+    description:
+      'Capacidade máxima de pessoas/assentos definida pelo organizador',
   })
   @IsNumber()
   @Min(1)
